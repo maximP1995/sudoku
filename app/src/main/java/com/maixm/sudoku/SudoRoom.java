@@ -6,6 +6,7 @@ import com.maixm.sudoku.entiy.SudoNumber;
 
 import java.util.ArrayList;
 import java.util.Random;
+//daily check
 
 public class SudoRoom implements NotifyTransporter{
     private SudoBlock[][] blocks;
