@@ -3,6 +3,7 @@ package com.maixm.sudoku.entiy;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class SudoNumber {
     public int value;
@@ -17,23 +18,26 @@ public class SudoNumber {
         availableValues = null;
     }
     public int setRandomValue(){
-        if (availableValues!=null&&availableValues.size()>0){
-            int index = (int) (Math.random()*(availableValues.size()-1));
-            int result = availableValues.get(index);
-            value = result;
+        if (availableValues.size()>1){
+            int index = new Random().nextInt(availableValues.size()-1);
+            int value = availableValues.get(index);
+            this.value = value;
+            availableValues.remove(index);
+            return value;
+        }else if (availableValues.size() == 1){
+            int value = availableValues.get(0);
+            this.value = value;
+            availableValues.remove(0);
             return value;
         }else {
-            return 0;
+            return -1;
         }
     }
     public void removeAvailableValue(int value){
-        if (availableValues!=null&&availableValues.size()>0){
-            for (int i = 0;i<availableValues.size();i++){
-                int listValue = availableValues.get(i);
-                if (listValue == value){
-                    availableValues.remove(i);
-                    break;
-                }
+        for (int index = 0;index<availableValues.size();index++){
+            if (availableValues.get(index) == value){
+                availableValues.remove(index);
+                break;
             }
         }
     }

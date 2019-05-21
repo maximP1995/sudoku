@@ -3,105 +3,99 @@ package com.maixm.sudoku;
 import com.maixm.sudoku.entiy.SudoNumber;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class SudoBlock {
     public int blockTag;
+    public int[] firstRow;
+    public int[] secondRow;
+    public int[] thirdRow;
+    public int[] firstColumn;
+    public int[] secondColumn;
+    public int[] thirdColumn;
     private SudoNumber[][] table;
-    private ArrayList<Integer> totalNumber;
-    private NotifyTransporter transporter;
-    public SudoBlock(NotifyTransporter transporter){
-        this.transporter = transporter;
+    private ArrayList<Integer> availableValues;
+    public SudoBlock(){
+        firstRow = new int[3];
+        secondRow = new int[3];
+        thirdRow = new int[3];
+        firstColumn = new int[3];
+        secondColumn = new int[3];
+        thirdColumn = new int[3];
+        availableValues = new ArrayList<>();
         table = new SudoNumber[3][3];
-        for (int row = 0;row < 3;row++){
-            for (int column = 0; column < 3; column++){
-                table[row][column] = new SudoNumber();
+        for (int r = 0;r<3;r++){
+            for (int c = 0;c<3;c++){
+                table[r][c] = new SudoNumber();
             }
         }
-        totalNumber = new ArrayList<>();
+    }
+    public SudoBlock generateCentralBlock(){
         for (int i = 1;i<10;i++){
-            totalNumber.add(i);
+            availableValues.add(i);
+        }
+        for (int r = 0;r<3;r++){
+            for (int c = 0;c<3;c++){
+                SudoNumber number = new SudoNumber();
+                Random random = new Random();
+                int index = 0;
+                if (availableValues.size()>1){
+                    index = random.nextInt(availableValues.size()-1);
+                }
+                number.value = availableValues.get(index);
+                availableValues.remove(index);
+                table[r][c] = number;
+            }
+        }
+        wrap();
+        return this;
+    }
+    public void wrap(){
+        for (int r = 0;r<3;r++){
+            for (int c = 0;c<3;c++){
+                if (r==0)firstRow[c] = table[r][c].value;
+                if (r==1)secondRow[c] = table[r][c].value;
+                if (r==2)thirdRow[c] = table[r][c].value;
+            }
+        }
+        for (int c = 0;c<3;c++){
+            for (int r = 0;r<3;r++){
+                if (c == 0) firstColumn[r] = table[r][c].value;
+                if (c == 1) secondColumn[r] = table[r][c].value;
+                if (c == 2) thirdColumn[r] = table[r][c].value;
+            }
         }
     }
-
-    public void generateRandomNumber(){
-        int threshold = 5;
-        int randomCount = 0;
-        while(randomCount<2){
-            for (int row = 0;row <3 ;row++){
-                if (randomCount>5)break;
-                for (int column = 0;column <3 ;column ++){
-                    int random = (int) (Math.random()*10);
-                    if (random>threshold){
-                        if (random>5)break;
-                        setRandomTo(row,column);
-                        randomCount += 1;
-                    }
+    public void generateTableWithRow(){
+        for (int r = 0;r<3;r++){
+            for (int c = 0;c<3;c++){
+                if (r == 0){
+                    table[r][c].value = firstRow[c];
+                }
+                if (r == 1){
+                    table[r][c].value = secondRow[c];
+                }
+                if (r == 2){
+                    table[r][c].value = thirdRow[c];
                 }
             }
         }
+        wrap();
     }
-    public int getRestCount(){
-        return totalNumber.size();
-    }
-    private void removeFromTotal(int randomNumber){
-        for (int i = 0;i<totalNumber.size();i++){
-            if (totalNumber.get(i)==randomNumber){
-                totalNumber.remove(i);
-                break;
+    public void generateTableWithColumn(){
+        for (int c = 0;c<3;c++){
+            for (int r = 0;r<3;r++){
+                if (c == 0){
+                    table[r][c].value = firstColumn[r];
+                }
+                if (c == 1){
+                    table[r][c].value = secondColumn[r];
+                }
+                if (c == 2){
+                    table[r][c].value = thirdColumn[r];
+                }
             }
         }
-    }
-    private void setRandomTo(int row,int column){
-        SudoNumber number = table[row][column];
-        int result = number.setRandomValue();
-        notifyNumbers(result);
-        sendVerticalNotify(column,result);
-        sendHorizontalNotify(row,result);
-        removeFromTotal(result);
-    }
-    public void sendVerticalNotify(int column,int value){
-        VerticalNotify notify = new VerticalNotify(column,value);
-        if (transporter!=null)transporter.handleVertical(notify,blockTag);
-    }
-    public void sendHorizontalNotify(int row,int value){
-        HorizontalNotify notify = new HorizontalNotify(row,value);
-        if (transporter!=null)transporter.handleHorizontal(notify,blockTag);
-    }
-    public void getVerticalNotify(VerticalNotify notify){
-        int column = notify.column;
-        int value = notify.number;
-        notifyColumn(column,value);
-    }
-    public void getHorizontalNotify(HorizontalNotify notify){
-        int row = notify.row;
-        int value = notify.number;
-        notifyRow(row,value);
-    }
-    public void notifyNumbers(int unavailableNumber){
-        for (int row = 0;row<3;row++){
-            for (int column = 0;column<3;column++){
-                SudoNumber number = table[row][column];
-                number.removeAvailableValue(unavailableNumber);
-            }
-        }
-    }
-    public void notifyColumn(int column,int number){
-        for (int row = 0;row<3;row++){
-            table[row][column].removeAvailableValue(number);
-        }
-    }
-    public void notifyRow(int row,int number){
-        for (int column = 0;column<3;column++){
-            table[row][column].removeAvailableValue(number);
-        }
-    }
-    public void print(){
-        for (int row = 0;row<3;row++){
-            for (int column = 0;column<3;column++){
-                int value = table[row][column].value;
-                System.out.print(" "+value);
-            }
-            System.out.print("\n");
-        }
+        wrap();
     }
 }

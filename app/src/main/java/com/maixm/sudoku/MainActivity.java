@@ -15,20 +15,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tv_answer = findViewById(R.id.tv_answer);
         tv_answer.setOnClickListener(this);
         sudoRoom = new SudoRoom();
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                sudoRoom.generateRandom();
-            }
-        });
-        thread.start();
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.tv_answer:
-                sudoRoom.print();
+//                sudoRoom.print();
                 break;
         }
     }
