@@ -30,6 +30,24 @@ public class SudoBlock {
             }
         }
     }
+    public void generateFakeNumber(){
+        int count = 0;
+        while (count<4){
+            for (int r = 0;r<3;r++){
+                if (count == 7)break;
+                for (int c = 0;c<3;c++){
+                    if (count == 7)break;
+                    SudoNumber number = table[r][c];
+                    int random = (int) (Math.random()*10);
+                    if (random>5){
+                        number.value = 0;
+                        count+=1;
+                    }
+                }
+            }
+        }
+        wrap();
+    }
     public SudoBlock generateCentralBlock(){
         for (int i = 1;i<10;i++){
             availableValues.add(i);

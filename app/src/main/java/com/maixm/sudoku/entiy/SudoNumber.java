@@ -7,6 +7,8 @@ import java.util.Random;
 
 public class SudoNumber {
     public int value;
+    public int playerInsert;
+    public boolean hasFlag;
     public ArrayList<Integer> availableValues = new ArrayList<>();
     public int blockTag;
     public SudoNumber(){
